@@ -1,6 +1,4 @@
 @inherits LayoutComponentBase
-@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
-@inject ProtectedSessionStorage SessionStorage
 @inject NavigationManager Navigation
 
 
@@ -17,10 +15,7 @@
             <a class="navbar-brand brand-logo text-white font-weight-bold" href="/admin">NiiAbe Admin</a>
         </div>
         <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
-            <button class="btn btn-outline-danger btn-sm" @onclick="Logout">
-                <i class="fas fa-sign-out-alt me-1"></i>
-                Logout
-            </button>
+            <LogoutButton />
         </div>
     </nav>
     
@@ -29,13 +24,6 @@
         <!-- Simple sidebar -->
         <nav class="sidebar sidebar-offcanvas" id="sidebar">
             <ul class="nav">
-                <li class="nav-item user-profile">
-                    <div class="user-image">
-                        <img src="Frontend/img/profile/m1.jpg">
-                    </div>
-                    <LogoutButton />                  
-                </li>
-
                 @* Actual Side Nav *@
                 
                 <li class="nav-item">
@@ -76,25 +64,3 @@
         </div>
     </div>
 </div>
-
-
-@code {
-    private async Task Logout()
-    {
-        try
-        {
-            // Clear authentication state
-            await SessionStorage.DeleteAsync("isAuthenticated");
-            await SessionStorage.DeleteAsync("username");
-            
-            // Redirect to login
-            Navigation.NavigateTo("/login", forceLoad: true);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Logout error: {ex.Message}");
-            // Force redirect even if there's an error
-            Navigation.NavigateTo("/login", forceLoad: true);
-        }
-    }
-}
