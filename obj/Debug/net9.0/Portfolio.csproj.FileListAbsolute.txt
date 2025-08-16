@@ -136,6 +136,7 @@ C:\Users\F&F_ICT\Desktop\me\MyGits\Portfolio\obj\Debug\net9.0\Portfolio.Assembly
 C:\Users\F&F_ICT\Desktop\me\MyGits\Portfolio\obj\Debug\net9.0\Portfolio.AssemblyInfo.cs
 C:\Users\F&F_ICT\Desktop\me\MyGits\Portfolio\obj\Debug\net9.0\Portfolio.csproj.CoreCompileInputs.cache
 C:\Users\F&F_ICT\Desktop\me\MyGits\Portfolio\obj\Debug\net9.0\Portfolio.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\F&F_ICT\Desktop\me\MyGits\Portfolio\obj\Debug\net9.0\Portfolio.sourcelink.json
 C:\Users\F&F_ICT\Desktop\me\MyGits\Portfolio\obj\Debug\net9.0\rjimswa.dswa.cache.json
 C:\Users\F&F_ICT\Desktop\me\MyGits\Portfolio\obj\Debug\net9.0\rjsmrazor.dswa.cache.json
 C:\Users\F&F_ICT\Desktop\me\MyGits\Portfolio\obj\Debug\net9.0\rjsmcshtml.dswa.cache.json
