@@ -53,6 +53,10 @@ Follow these instructions to get the project running on your local machine.
     *   **Username:** `admin`
     *   **Password:** `admin123`
 
+5.  **Populate DB with some Projects:**
+    *   Click on Seed Sample Data to get some Data in the DB.
+ 
+
 ## Project Structure
 
 Here's a brief overview of the key files and folders to help you navigate the codebase:
