@@ -1,9 +1,8 @@
-@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
-@inject ProtectedSessionStorage SessionStorage
+@using Microsoft.AspNetCore.Components.Authorization
 @inject NavigationManager Navigation
 @rendermode InteractiveServer
 
-@if (isAuthenticated)
+@if (isAuthorized)
 {
     @ChildContent
 }
@@ -19,69 +18,30 @@ else if (isLoading)
     </div>
 }
 
+
 @code {
-    [Parameter] public RenderFragment? ChildContent { get; set; }
-    
-    private bool isAuthenticated = false;
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationStateTask { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    private bool isAuthorized;
     private bool isLoading = true;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
-        await CheckAuthentication();
-    }
+        var authState = await AuthenticationStateTask;
+        var user = authState.User;
 
-    private async Task CheckAuthentication()
-    {
-        try
+        if (user.Identity != null && user.Identity.IsAuthenticated)
         {
-            var authResult = await SessionStorage.GetAsync<bool>("isAuthenticated");
-            var loginTimeResult = await SessionStorage.GetAsync<DateTime>("loginTime");
-            
-            if (authResult.Success && authResult.Value)
-            {
-                // Check if session has expired (24 hours)
-                if (loginTimeResult.Success)
-                {
-                    var sessionAge = DateTime.UtcNow - loginTimeResult.Value;
-                    if (sessionAge.TotalHours > 24)
-                    {
-                        // Session expired, clear and redirect
-                        await ClearSession();
-                        return;
-                    }
-                }
-                
-                isAuthenticated = true;
-            }
-            else
-            {
-                // Not authenticated, redirect to login
-                Navigation.NavigateTo("/login");
-            }
+            isAuthorized = true;
         }
-        catch (Exception)
+        else
         {
-            // Error reading session, redirect to login
-            Navigation.NavigateTo("/login");
+            Navigation.NavigateTo("/login", forceLoad: true);
         }
-        finally
-        {
-            isLoading = false;
-        }
-    }
-
-    private async Task ClearSession()
-    {
-        try
-        {
-            await SessionStorage.DeleteAsync("isAuthenticated");
-            await SessionStorage.DeleteAsync("loginTime");
-        }
-        catch (Exception)
-        {
-            // Ignore errors when clearing session
-        }
-        
-        Navigation.NavigateTo("/login");
+        isLoading = false;
     }
 }
