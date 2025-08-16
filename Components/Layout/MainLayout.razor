@@ -1,0 +1,90 @@
+﻿@inherits LayoutComponentBase
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nii Abe | Portfolio Page</title>
+    <meta name="description" content="Portfolio of Nii Abe: Web Developer, Graphic Designer, and Video/Motion Artist. Showcasing web development, graphic design, and motion/video projects.">
+    <meta name="keywords" content="Portfolio, Web Developer, Graphic Designer, Motion Artist, Video, Projects, Your Name">
+    <meta name="author" content="Nii Abe">
+    <link rel="canonical" href="https://github.com/niiabe/portfolio-page/">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">    <link rel="icon" href="Frontend/img/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="Frontend/css/styles.css">
+    <style>
+    /* RED SCROLLBAR TEST */
+    ::-webkit-scrollbar {
+      width: 2px;
+      height: 2px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background-color: #ccc;
+      border-radius: 2px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background-color: #aaa;
+    }
+
+    ::-webkit-scrollbar-track {
+      background-color: #f1f1f1;
+    }
+
+    </style>
+    
+</head>
+<body class="bg-white text-gray-800">
+
+    <div class="container-fluid">
+        <div class="row min-vh-100">
+            <!-- Sidebar/About Panel -->
+            <aside class="col-lg-3 col-md-4 d-flex flex-column align-items-center justify-content-center shadow-lg py-5 px-3 mt-0"
+                style="min-width:260px; background-color:#da41e7; height:100vh;">
+                <img src="Frontend/img/profile/m1.jpg" alt="Nii Abe Profile Picture" class="rounded-full mb-6 border-4 border-white shadow" style="width:200px; height:200px; object-fit:cover;">
+                <h1 class="text-4xl font-bold text-white mb-2 mr-2" style="font-family: 'DM Serif Display', serif; font-style: italic; " > Nii Abe </h1>
+                <p>
+                    <a href="https://github.com/niiabe?tab=repositories" target="_blank" title="Github"><img src="Frontend/img/icons/github-sign.png" alt="github icon" class="inline-block mr-1" style="width: 24px; height: 24px;"></a>
+                    <a href="https://www.youtube.com/@@LocalInfoMaker" target="_blank" title="Youtube "><img src="Frontend/img/icons/youtube.png" alt="youtube icon" class="inline-block mr-1" style="width: 24px; height: 24px;"></a>   
+                    <a href="#" target="_blank" title="Behance"><img src="Frontend/img/icons/behance.png" alt="Behance icon" class="inline-block mr-1" style="width: 24px; height: 24px;"></a>
+                    <a href="#" target="_blank" title="X"><img src="Frontend/img/icons/twitter.png" alt="X" class="inline-block mr-1" style="width: 24px; height: 24px;"></a> 
+                </p>
+               <p class="text-lg mb-3 text-center text-black-bold">
+                   <strong>I am a passionate person who loves to create and innovate. My expertise lies in multiple fields, including:</strong>                                    
+                </p>
+                <nav class="w-100" aria-label="Main navigation">
+                    <ul class="nav flex-column text-center">
+                        <li class="nav-item mb-2">
+                            <a class="nav-link text-white font-semibold" href="#webdev">Web Development</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a class="nav-link text-white font-semibold" href="#graphic-design">Graphic Design</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a class="nav-link text-white font-semibold" href="#video-motion">Video/Motion</a>
+                        </li>
+                    </ul>
+                </nav>
+            </aside>
+            <!-- Main Content -->
+            <main class="col-lg-9 col-md-8 py-5 px-4" style="height:100vh; overflow:auto;">    
+
+                
+                @Body            
+                
+                
+                <footer class="text-center py-4" style="background-color: #da41e7;">
+                    <p>&copy; 2025 NiiAbe. All rights reserved.</p>
+                </footer>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="Frontend/js/main.js"></script>
+</body>

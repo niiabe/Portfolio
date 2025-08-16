@@ -1,0 +1,100 @@
+@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage SessionStorage
+@inject NavigationManager Navigation
+
+
+<!-- Add the admin CSS files to the head -->
+<link rel="stylesheet" href="Admin/vendors/mdi/css/materialdesignicons.min.css">
+<link rel="stylesheet" href="Admin/vendors/feather/feather.css">
+<link rel="stylesheet" href="Admin/vendors/base/vendor.bundle.base.css">
+<link rel="stylesheet" href="Admin/css/style.css">
+
+<div class="container-scroller">
+    <!-- Simple navbar -->
+    <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+        <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
+            <a class="navbar-brand brand-logo text-white font-weight-bold" href="/admin">NiiAbe Admin</a>
+        </div>
+        <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
+            <button class="btn btn-outline-danger btn-sm" @onclick="Logout">
+                <i class="fas fa-sign-out-alt me-1"></i>
+                Logout
+            </button>
+        </div>
+    </nav>
+    
+    <div class="container-fluid page-body-wrapper">
+        
+        <!-- Simple sidebar -->
+        <nav class="sidebar sidebar-offcanvas" id="sidebar">
+            <ul class="nav">
+                <li class="nav-item user-profile">
+                    <div class="user-image">
+                        <img src="Frontend/img/profile/m1.jpg">
+                    </div>
+                    <LogoutButton />                  
+                </li>
+
+                @* Actual Side Nav *@
+                
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin">
+                        <span class="menu-title">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/projects">
+                        <span class="menu-title">Projects</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/add-project">
+                        <span class="menu-title">Add Project</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/categories">
+                        <i class="icon-pie-graph menu-icon"></i>
+                        <span class="menu-title">Categories</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/settings">
+                        <i class="icon-command menu-icon"></i>
+                        <span class="menu-title">Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        
+        <!-- Main content -->
+        <div class="main-panel">
+            <div class="content-wrapper">
+                @Body
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    private async Task Logout()
+    {
+        try
+        {
+            // Clear authentication state
+            await SessionStorage.DeleteAsync("isAuthenticated");
+            await SessionStorage.DeleteAsync("username");
+            
+            // Redirect to login
+            Navigation.NavigateTo("/login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Logout error: {ex.Message}");
+            // Force redirect even if there's an error
+            Navigation.NavigateTo("/login", forceLoad: true);
+        }
+    }
+}

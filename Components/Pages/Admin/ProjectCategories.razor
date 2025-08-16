@@ -1,0 +1,65 @@
+@page "/admin/categories"
+@using Portfolio.Services
+@layout Components.Layout.AdminLayout
+@rendermode InteractiveServer
+
+<div class="row">
+    <div class="col-md-12 grid-margin">
+        <div class="d-flex justify-content-between flex-wrap">
+            <div class="d-flex align-items-end flex-wrap">
+                <div class="mr-md-3 mr-xl-5">
+                    <h2>Categotires</h2>
+                    <p class="mb-md-0">Manage your portfolio Categories</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h4>Category List</h4>
+                <p>This is your admin panel. Database integration coming next!</p>
+                <p>
+                    <table class="table table-hover">
+                        <thead>
+                            <th>Category</th>
+                            <th>Count</th>
+                        </thead>
+                        <tr>
+                            <td>Web</td>
+                            <td>12</td>
+                        </tr>
+                        <tr>
+                            <td>Graphics</td>
+                            <td><span class="btn btn-danger btn-sm btn-round btn-icon center">12</span></td>
+                        </tr>
+                        <tr>
+                            <td>Video</td>
+                            <td>12</td>
+                        </tr>
+
+                    </table>
+                </p>
+            </div>
+        </div>      
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">Add Category</h4>
+                  <form class="forms-sample">
+                    <div class="form-group">
+                      <label for="category">Category</label>
+                      <input type="text" class="form-control" id="category" placeholder="Category">
+                    </div>
+                    <button type="submit" class="btn btn-primary mr-2">Submit</button>
+                    <button class="btn btn-light">Cancel</button>
+                  </form>
+                </div>
+              </div>
+    </div>
+</div>
+

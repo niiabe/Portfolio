@@ -1,0 +1,62 @@
+@using Portfolio.Models
+
+<!-- Reusable Project Card Component -->
+<div class="card shadow" style="min-width: 300px; max-width: 300px;">
+    <img src="@GetImageUrl()" class="card-img-top" alt="@Project.Title" style="height:180px; object-fit:cover;" 
+         onerror="this.src='Frontend/img/placeholder.jpg'">
+    <div class="card-body">
+        <h5 class="card-title">
+            <strong>@Project.Title</strong>
+        </h5>
+        <p class="card-text">
+            @Project.Description
+            @if (!string.IsNullOrEmpty(Project.ProjectLink))
+            {
+                <br>
+                <a href="@Project.ProjectLink" target="_blank" class="text-primary" style="text-decoration:underline;">
+                    @GetLinkText()
+                </a>
+            }
+        </p>
+        @* Show category badge *@
+        <div class="mt-2">
+            <span class="badge badge-@GetCategoryBadgeClass() badge-pill">
+                @Project.Category
+            </span>
+            <small class="text-muted ml-2">@Project.CreatedAt.ToString("MMM yyyy")</small>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public Project Project { get; set; } = null!;
+
+    private string GetImageUrl()
+    {
+        return string.IsNullOrEmpty(Project.ImageUrl) 
+            ? "Frontend/img/placeholder.jpg" 
+            : Project.ImageUrl;
+    }
+
+    private string GetLinkText()
+    {
+        return Project.Category switch
+        {
+            "Web" => "View Project",
+            "Graphics" => "View Design", 
+            "Video" => "View Video",
+            _ => "View Project"
+        };
+    }
+
+    private string GetCategoryBadgeClass()
+    {
+        return Project.Category switch
+        {
+            "Web" => "primary",
+            "Graphics" => "success",
+            "Video" => "warning",
+            _ => "secondary"
+        };
+    }
+}

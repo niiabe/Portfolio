@@ -1,0 +1,46 @@
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage SessionStorage
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<div class="dropdown">
+    <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="fas fa-user-circle me-1"></i>
+        Admin
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end">
+        <li>
+            <span class="dropdown-item-text">
+                <small class="text-muted">Signed in as Admin</small>
+            </span>
+        </li>
+        <li><hr class="dropdown-divider"></li>
+        <li>
+            <button class="dropdown-item text-danger" @onclick="Logout">
+                <i class="fas fa-sign-out-alt me-2"></i>
+                Logout
+            </button>
+        </li>
+    </ul>
+</div>
+
+@code {
+    private async Task Logout()
+    {
+        try
+        {
+            // Clear authentication state
+            await SessionStorage.DeleteAsync("isAuthenticated");
+            await SessionStorage.DeleteAsync("loginTime");
+            
+            // Redirect to login
+            Navigation.NavigateTo("/login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Logout error: {ex.Message}");
+            // Force redirect even if there's an error
+            Navigation.NavigateTo("/login", forceLoad: true);
+        }
+    }
+}

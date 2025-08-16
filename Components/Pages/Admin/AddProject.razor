@@ -1,0 +1,121 @@
+@page "/admin/add-project"
+@layout Components.Layout.AdminLayout
+@using Portfolio.Models
+@using Portfolio.Data
+@inject PortfolioDbContext DbContext
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<div class="row">
+    <div class="col-md-8 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Add New Project</h4>
+                <p class="card-description">Fill in the project details</p>
+                
+                <EditForm Model="@newProject" OnValidSubmit="@HandleSubmit">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary class="text-danger" />
+                    
+                    <div class="form-group">
+                        <label for="title">Project Title</label>
+                        <InputText id="title" class="form-control" @bind-Value="newProject.Title" placeholder="Enter project title" />
+                        <ValidationMessage For="@(() => newProject.Title)" class="text-danger" />
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <InputSelect id="category" class="form-control" @bind-Value="newProject.Category">
+                            <option value="">Select Category</option>
+                            <option value="Web">Web</option>
+                            <option value="Graphics">Graphics</option>
+                            <option value="Video">Video</option>
+                        </InputSelect>
+                        <ValidationMessage For="@(() => newProject.Category)" class="text-danger" />
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <InputTextArea id="description" class="form-control" @bind-Value="newProject.Description" rows="4" placeholder="Enter project description" />
+                        <ValidationMessage For="@(() => newProject.Description)" class="text-danger" />
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="imageUrl">Image URL</label>
+                        <InputText id="imageUrl" class="form-control" @bind-Value="newProject.ImageUrl" placeholder="Enter image URL" />
+                        <ValidationMessage For="@(() => newProject.ImageUrl)" class="text-danger" />
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="projectLink">Project Link</label>
+                        <InputText id="projectLink" class="form-control" @bind-Value="newProject.ProjectLink" placeholder="Enter project URL" />
+                        <ValidationMessage For="@(() => newProject.ProjectLink)" class="text-danger" />
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success mr-2" disabled="@isSubmitting">
+                        @if (isSubmitting)
+                        {
+                            <span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span>
+                        }
+                        Save Project
+                    </button>
+                    <a href="/admin" class="btn btn-light">Cancel</a>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <div class="alert alert-success mt-3">
+        @message
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger mt-3">
+        @errorMessage
+    </div>
+}
+
+@code {
+    private Project newProject = new();
+    private string message = "";
+    private string errorMessage = "";
+    private bool isSubmitting = false;
+
+    private async Task HandleSubmit()
+    {
+        try
+        {
+            isSubmitting = true;
+            errorMessage = "";
+            
+            // Set created date
+            newProject.CreatedAt = DateTime.UtcNow;
+            
+            // Save to database
+            DbContext.Projects.Add(newProject);
+            await DbContext.SaveChangesAsync();
+            
+            message = $"Project '{newProject.Title}' in category '{newProject.Category}' saved to database successfully!";
+            newProject = new(); // Reset form
+            
+            // Clear message after 3 seconds
+            await Task.Delay(3000);
+            message = "";
+            StateHasChanged();
+            Navigation.NavigateTo($"/admin/projects");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error saving project: {ex.Message}";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+}

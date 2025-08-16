@@ -1,0 +1,192 @@
+@page "/admin/edit-project/{Id:int}"
+@layout Components.Layout.AdminLayout
+@using Portfolio.Models
+@using Portfolio.Data
+@using Microsoft.EntityFrameworkCore
+@inject PortfolioDbContext DbContext
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<div class="row">
+    <div class="col-md-8 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                @if (project == null)
+                {
+                    <div class="text-center">
+                        <div class="spinner-border" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        <p>Loading project...</p>
+                    </div>
+                }
+                else if (projectNotFound)
+                {
+                    <div class="alert alert-danger">
+                        <h4>Project Not Found</h4>
+                        <p>The project with ID @Id was not found.</p>
+                        <a href="/admin/projects" class="btn btn-primary">Back to Projects</a>
+                    </div>
+                }
+                else
+                {
+                    <h4 class="card-title">Edit Project</h4>
+                    <p class="card-description">Update project details</p>
+                    
+                    <EditForm Model="@project" OnValidSubmit="@HandleSubmit">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary class="text-danger" />
+                        
+                        <div class="form-group">
+                            <label for="title">Project Title</label>
+                            <InputText id="title" class="form-control" @bind-Value="project.Title" placeholder="Enter project title" />
+                            <ValidationMessage For="@(() => project.Title)" class="text-danger" />
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="category">Category</label>
+                            <InputSelect id="category" class="form-control" @bind-Value="project.Category">
+                                <option value="">Select Category</option>
+                                <option value="Web">Web</option>
+                                <option value="Graphics">Graphics</option>
+                                <option value="Video">Video</option>
+                            </InputSelect>
+                            <ValidationMessage For="@(() => project.Category)" class="text-danger" />
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <InputTextArea id="description" class="form-control" @bind-Value="project.Description" rows="4" placeholder="Enter project description" />
+                            <ValidationMessage For="@(() => project.Description)" class="text-danger" />
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="imageUrl">Image URL</label>
+                            <InputText id="imageUrl" class="form-control" @bind-Value="project.ImageUrl" placeholder="Enter image URL" />
+                            <ValidationMessage For="@(() => project.ImageUrl)" class="text-danger" />
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="projectLink">Project Link</label>
+                            <InputText id="projectLink" class="form-control" @bind-Value="project.ProjectLink" placeholder="Enter project URL" />
+                            <ValidationMessage For="@(() => project.ProjectLink)" class="text-danger" />
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Created Date</label>
+                            <p class="form-control-static">@project.CreatedAt.ToString("MMMM dd, yyyy 'at' hh:mm tt")</p>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success mr-2" disabled="@isSubmitting">
+                            @if (isSubmitting)
+                            {
+                                <span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span>
+                            }
+                            Update Project
+                        </button>
+                        <a href="/admin/projects" class="btn btn-light">Cancel</a>
+                        <button type="button" class="btn btn-danger ml-2" @onclick="@(() => DeleteProject())" disabled="@isSubmitting">
+                            Delete Project
+                        </button>
+                    </EditForm>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <div class="alert alert-success mt-3">
+        @message
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger mt-3">
+        @errorMessage
+    </div>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    
+    private Project? project;
+    private bool projectNotFound = false;
+    private string message = "";
+    private string errorMessage = "";
+    private bool isSubmitting = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProject();
+    }
+
+    private async Task LoadProject()
+    {
+        try
+        {
+            project = await DbContext.Projects.FindAsync(Id);
+            if (project == null)
+            {
+                projectNotFound = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error loading project: {ex.Message}";
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        try
+        {
+            isSubmitting = true;
+            errorMessage = "";
+            
+            // Update the project in database
+            DbContext.Projects.Update(project!);
+            await DbContext.SaveChangesAsync();
+            
+            message = $"Project '{project!.Title}' updated successfully!";
+            
+            // Clear message after 3 seconds
+            await Task.Delay(3000);
+            message = "";
+            StateHasChanged();
+            NavigationManager.NavigateTo($"/admin/projects");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error updating project: {ex.Message}";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private async Task DeleteProject()
+    {
+        try
+        {
+            isSubmitting = true;
+            
+            if (project != null)
+            {
+                DbContext.Projects.Remove(project);
+                await DbContext.SaveChangesAsync();
+                
+                // Redirect to projects list after deletion
+                NavigationManager.NavigateTo("/admin/projects");
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error deleting project: {ex.Message}";
+            isSubmitting = false;
+        }
+    }
+}

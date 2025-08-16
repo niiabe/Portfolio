@@ -1,0 +1,4 @@
+this version uses image links instead or uploading images. 
+
+I will make another one that uploads images. 
+Note. I am now learning Dotnet Blazor

@@ -1,0 +1,122 @@
+@page "/admin"
+@using Portfolio.Services
+@layout Components.Layout.AdminLayout
+@inject SeedDataService SeedService
+@rendermode InteractiveServer
+@inject SimpleAuthService AuthService
+
+<AuthGuard>
+<div class="row">
+    <div class="col-md-12 grid-margin">
+        <div class="d-flex justify-content-between flex-wrap">
+            <div class="d-flex align-items-end flex-wrap">
+                <div class="mr-md-3 mr-xl-5">
+                    <h2>Welcome to Portfolio Admin</h2>
+                    <p class="mb-md-0">Manage your portfolio projects</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h4>Admin Dashboard</h4>
+                <p>This is your admin panel. Database integration coming next!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h4>Database Management</h4>
+                <button class="btn btn-warning mr-2" @onclick="SeedData" disabled="@isSeeding">
+                    @if (isSeeding)
+                    {
+                        <span class="spinner-border spinner-border-sm mr-2"></span>
+                    }
+                    Seed Sample Data
+                </button>
+                
+                @if (!string.IsNullOrEmpty(seedMessage))
+                {
+                    <div class="alert alert-success mt-2">@seedMessage</div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Temporary test section -->
+<div class="row mt-3">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h4>Test Authentication Service</h4>
+                <button class="btn btn-info" @onclick="TestAuth">Test Authentication</button>
+                @if (!string.IsNullOrEmpty(testResult))
+                {
+                    <pre class="mt-2 p-3 bg-light">@testResult</pre>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+</AuthGuard>
+
+@code {
+    private string testResult = "";
+
+    private void TestAuth()
+    {
+        // Test the authentication service
+        bool isValid = AuthService.ValidateAdmin("admin", "admin123");
+        testResult = $"Test Result: {(isValid ? "✅ SUCCESS" : "❌ FAILED")}\n";
+        
+        // Show generated hash for configuration
+        string hash = AuthService.GeneratePasswordHash("admin123");
+        testResult += $"Generated hash for 'admin123': {hash}\n";
+        testResult += $"You can add this to appsettings.json for extra security";
+    }
+}
+
+
+
+
+
+@code {
+    private bool isSeeding = false;
+    private string seedMessage = "";
+
+    private async Task SeedData()
+    {
+        try
+        {
+            isSeeding = true;
+            seedMessage = "";
+            
+            await SeedService.SeedProjectsAsync();
+            seedMessage = "Sample data seeded successfully!";
+            
+            // Clear message after 5 seconds
+            await Task.Delay(5000);
+            seedMessage = "";
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            seedMessage = $"Error seeding data: {ex.Message}";
+        }
+        finally
+        {
+            isSeeding = false;
+        }
+    }
+}

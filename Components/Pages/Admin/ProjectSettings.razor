@@ -1,0 +1,57 @@
+@page "/admin/settings"
+@using Portfolio.Services
+@layout Components.Layout.AdminLayout
+@rendermode InteractiveServer
+
+<div class="row">
+    <div class="col-md-12 grid-margin">
+        <div class="d-flex justify-content-between flex-wrap">
+            <div class="d-flex align-items-end flex-wrap">
+                <div class="mr-md-3 mr-xl-5">
+                    <h2>Future features</h2>
+                    <p class="mb-md-0">This page is for listing features to be added in the future</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h4>Category List</h4>
+                <p>This is your admin panel. Database integration coming next!</p>
+                <p>
+                    <ul class="unstyled-list">
+                        <li>Working Navbar Dropdown</li>
+                        <li>Analytics dashboard</li>
+                        <li>API integration</li>
+                        <li>User management</li>
+                        <li>Database integration / different DB (Google/SQL)</li>
+                        <li>Project management</li>
+                        <li>Responsive design improvements</li>
+                        <li>SEO optimizations</li>
+                        <li>page color management</li>
+                    </ul>
+                </p>
+            </div>
+        </div>      
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">Add Category</h4>
+                  <form class="forms-sample">
+                    <div class="form-group">
+                      <label for="category">Category</label>
+                      <input type="text" class="form-control" id="category" placeholder="Category">
+                    </div>
+                    <button type="submit" class="btn btn-primary mr-2">Submit</button>
+                    <button class="btn btn-light">Cancel</button>
+                  </form>
+                </div>
+              </div>
+    </div>
+</div>
+

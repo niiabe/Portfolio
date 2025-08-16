@@ -1,0 +1,112 @@
+@page "/"
+@layout Components.Layout.MainLayout
+@using Portfolio.Components
+@using Portfolio.Components.Layout
+
+@using Portfolio.Models
+@using Portfolio.Data
+@using Microsoft.EntityFrameworkCore
+@inject PortfolioDbContext DbContext
+@rendermode InteractiveServer
+
+@* Main content of the portfolio page *@
+
+@if (projects == null)
+{
+    <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+        <p class="mt-2">Loading projects...</p>
+    </div>
+}
+else
+{
+    <!-- Web Development Projects -->
+    @if (webProjects.Any())
+    {
+        <section id="webdev" class="mb-5">
+            <div class="d-flex align-items-center mb-3">
+                <h2 class="text-3xl font-bold mb-0 mr-3" style="color: #da41e7; font-family: 'DM Serif Display', serif;">Web Development Projects</h2>
+                <a href="#webdev" class="ml-2 small text-black" style="text-decoration:underline;">See more (@webProjects.Count())</a>
+            </div>
+            <div class="d-flex flex-row overflow-auto pb-3" style="gap: 1.5rem;">
+                @foreach (var project in webProjects)
+                {
+                    <ProjectCard Project="project" />
+                }
+            </div>
+        </section>
+    }
+
+    <!-- Graphic Design Projects -->
+    @if (graphicsProjects.Any())
+    {
+        <section id="graphic-design" class="mb-5">
+            <div class="d-flex align-items-center mb-3">
+                <h2 class="text-3xl font-bold mb-0 mr-3" style="color: #da41e7; font-family: 'DM Serif Display', serif;">Graphic Design</h2>
+                <a href="#graphic-design" class="ml-2 small text-black" style="text-decoration:underline;">See more (@graphicsProjects.Count())</a>
+            </div>
+            <div class="d-flex flex-row overflow-auto pb-3" style="gap: 1.5rem;">
+                @foreach (var project in graphicsProjects)
+                {
+                    <ProjectCard Project="project" />
+                }
+            </div>
+        </section>
+    }
+
+    <!-- VideoMotion Projects -->
+    @if (videoProjects.Any())
+    {
+        <section id="video-motion" class="mb-5">
+            <div class="d-flex align-items-center mb-3">
+                <h2 class="text-3xl font-bold mb-0 mr-3" style="color: #da41e7; font-family: 'DM Serif Display', serif;">Video/Motion Projects</h2>
+                <a href="https://www.youtube.com/@@LocalInfoMaker" class="ml-2 small text-black" style="text-decoration:underline;">See more (@videoProjects.Count())</a>
+            </div>
+            <div class="d-flex flex-row overflow-auto pb-3" style="gap: 1.5rem;">
+                @foreach (var project in videoProjects)
+                {
+                    <ProjectCard Project="project" />
+                }
+            </div>
+        </section>
+    }
+
+    @* Show message if no projects exist *@
+    @if (!projects.Any())
+    {
+        <div class="text-center py-5">
+            <h3>No projects available</h3>
+            <p class="text-muted">Projects will appear here once they are added through the admin panel.</p>
+        </div>
+    }
+}
+
+@code {
+    private List<Project>? projects;
+    private IEnumerable<Project> webProjects => projects?.Where(p => p.Category == "Web") ?? new List<Project>();
+    private IEnumerable<Project> graphicsProjects => projects?.Where(p => p.Category == "Graphics") ?? new List<Project>();
+    private IEnumerable<Project> videoProjects => projects?.Where(p => p.Category == "Video") ?? new List<Project>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProjects();
+    }
+
+    private async Task LoadProjects()
+    {
+        try
+        {
+            projects = await DbContext.Projects
+                .OrderByDescending(p => p.CreatedAt)
+                .ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            // Handle error - you might want to show an error message
+            Console.WriteLine($"Error loading projects: {ex.Message}");
+            projects = new List<Project>();
+        }
+    }
+}

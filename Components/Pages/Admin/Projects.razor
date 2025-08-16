@@ -1,0 +1,202 @@
+@page "/admin/projects"
+@layout Components.Layout.AdminLayout
+@using Portfolio.Models
+@using Portfolio.Data
+@using Microsoft.EntityFrameworkCore
+@inject PortfolioDbContext DbContext
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<div class="row">
+    <div class="col-md-12 grid-margin">
+        <div class="d-flex justify-content-between flex-wrap">
+            <div class="d-flex align-items-end flex-wrap">
+                <div class="mr-md-3 mr-xl-5">
+                    <h2>All Projects</h2>
+                    <p class="mb-md-0">Manage your portfolio projects</p>
+                </div>
+            </div>
+            <div class="d-flex align-items-end flex-wrap">
+                <a href="/admin/add-project" class="btn btn-primary">+ Add New Project</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Projects List</h4>
+                
+                @if (projects == null)
+                {
+                    <div class="text-center">
+                        <div class="spinner-border" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        <p>Loading projects...</p>
+                    </div>
+                }
+                else if (!projects.Any())
+                {
+                    <div class="text-center">
+                        <p>No projects found.</p>
+                        <a href="/admin/add-project" class="btn btn-primary">Add Your First Project</a>
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Category</th>
+                                    <th>Description</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var project in projects)
+                                {
+                                    <tr>
+                                        <td>
+                                            <strong>@project.Title</strong>
+                                            @if (!string.IsNullOrEmpty(project.ProjectLink))
+                                            {
+                                                <br><small><a href="@project.ProjectLink" target="_blank">View Project</a></small>
+                                            }
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-@GetCategoryBadgeClass(project.Category)">
+                                                @project.Category
+                                            </span>
+                                        </td>
+                                        <td>
+                                            @if (project.Description.Length > 50)
+                                            {
+                                                @(project.Description.Substring(0, 50) + "...")
+                                            }
+                                            else
+                                            {
+                                                @project.Description
+                                            }
+                                        </td>
+                                        <td>@project.CreatedAt.ToString("MMM dd, yyyy")</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-info mr-1" @onclick="@(() => EditProject(project.Id))">Edit</button>
+                                            <button class="btn btn-sm btn-danger" @onclick="@(() => DeleteProject(project.Id))">Delete</button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Category Filter -->
+<div class="row mt-3">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h5>Filter by Category:</h5>
+                <button class="btn btn-sm @(selectedCategory == "All" ? "btn-primary" : "btn-outline-primary") mr-2" 
+                        @onclick="@(() => FilterByCategory("All"))">All (@totalCount)</button>
+                <button class="btn btn-sm @(selectedCategory == "Web" ? "btn-info" : "btn-outline-info") mr-2" 
+                        @onclick="@(() => FilterByCategory("Web"))">Web (@webCount)</button>
+                <button class="btn btn-sm @(selectedCategory == "Graphics" ? "btn-success" : "btn-outline-success") mr-2" 
+                        @onclick="@(() => FilterByCategory("Graphics"))">Graphics (@graphicsCount)</button>
+                <button class="btn btn-sm @(selectedCategory == "Video" ? "btn-warning" : "btn-outline-warning")" 
+                        @onclick="@(() => FilterByCategory("Video"))">Video (@videoCount)</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <div class="alert alert-success mt-3">
+        @message
+    </div>
+}
+
+@code {
+    private List<Project>? projects;
+    private List<Project>? allProjects;
+    private string selectedCategory = "All";
+    private int totalCount, webCount, graphicsCount, videoCount;
+    private string message = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProjects();
+    }
+
+    private async Task LoadProjects()
+    {
+        allProjects = await DbContext.Projects.OrderByDescending(p => p.CreatedAt).ToListAsync();
+        FilterByCategory(selectedCategory);
+        CalculateCounts();
+    }
+
+    private void FilterByCategory(string category)
+    {
+        selectedCategory = category;
+        if (allProjects != null)
+        {
+            projects = category == "All" 
+                ? allProjects 
+                : allProjects.Where(p => p.Category == category).ToList();
+        }
+    }
+
+    private void CalculateCounts()
+    {
+        if (allProjects != null)
+        {
+            totalCount = allProjects.Count;
+            webCount = allProjects.Count(p => p.Category == "Web");
+            graphicsCount = allProjects.Count(p => p.Category == "Graphics");
+            videoCount = allProjects.Count(p => p.Category == "Video");
+        }
+    }
+
+    private string GetCategoryBadgeClass(string category)
+    {
+        return category switch
+        {
+            "Web" => "info",
+            "Graphics" => "success",
+            "Video" => "warning",
+            _ => "secondary"
+        };
+    }
+
+    private void EditProject(int id)
+    {
+        NavigationManager.NavigateTo($"/admin/edit-project/{id}");
+    }
+
+    private async Task DeleteProject(int id)
+    {
+        var project = await DbContext.Projects.FindAsync(id);
+        if (project != null)
+        {
+            DbContext.Projects.Remove(project);
+            await DbContext.SaveChangesAsync();
+            message = $"Project '{project.Title}' deleted successfully!";
+            await LoadProjects(); // Refresh the list
+            
+            // Clear message after 3 seconds
+            await Task.Delay(3000);
+            message = "";
+            StateHasChanged();
+        }
+    }
+}

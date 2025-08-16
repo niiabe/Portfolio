@@ -1,0 +1,158 @@
+@page "/login"
+@using Portfolio.Services
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using System.ComponentModel.DataAnnotations
+@inject SimpleAuthService AuthService
+@inject ProtectedSessionStorage SessionStorage
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<div class="container-fluid d-flex align-items-center justify-content-center min-vh-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="row w-100 justify-content-center">
+        <div class="col-md-4">
+            <div class="card shadow-lg">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <h2 class="card-title mb-3" style="color: #da41e7; font-family: 'DM Serif Display', serif;">
+                            Portfolio Admin
+                        </h2>
+                        <p class="text-muted">Sign in to manage your portfolio</p>
+                    </div>
+
+                    <EditForm Model="@loginModel" OnValidSubmit="@HandleLogin">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary class="text-danger mb-3" />
+
+                        <div class="form-group mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <InputText id="username" class="form-control form-control-lg" 
+                                       @bind-Value="loginModel.Username" 
+                                       placeholder="Enter username" />
+                            <ValidationMessage For="@(() => loginModel.Username)" class="text-danger" />
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label for="password" class="form-label">Password</label>
+                            <InputText id="password" type="password" class="form-control form-control-lg" 
+                                       @bind-Value="loginModel.Password" 
+                                       placeholder="Enter password" />
+                            <ValidationMessage For="@(() => loginModel.Password)" class="text-danger" />
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(errorMessage))
+                        {
+                            <div class="alert alert-danger mb-3">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                @errorMessage
+                            </div>
+                        }
+
+                        <div class="d-grid gap-2 mb-3">
+                            <button type="submit" class="btn btn-primary btn-lg" disabled="@isLoading">
+                                @if (isLoading)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true">...</span>
+                                    
+                                }
+                                else
+                                {
+                                    <i class="fas fa-sign-in-alt me-2">Login</i>
+                                    
+                                }
+                            </button>
+                        </div>
+                    </EditForm>
+
+                    <div class="text-center mt-4">
+                        <a href="/" class="text-muted text-decoration-none">
+                            <i class="fas fa-arrow-left me-1"></i>
+                            Back to Portfolio
+                        </a>
+                    </div>
+
+                    @* Development info - can be removed in production *@
+                    @* <div class="mt-4 p-3 bg-light rounded">
+                        <small class="text-muted">
+                            <strong>Default credentials:</strong><br/>
+                            Username: <code>admin</code><br/>
+                            Password: <code>admin123</code>
+                        </small>
+                    </div> *@
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .min-vh-100 {
+        min-height: 100vh;
+    }
+</style>
+
+@code {
+    private LoginModel loginModel = new();
+    private string errorMessage = "";
+    private bool isLoading = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Check if already logged in
+        try
+        {
+            var authResult = await SessionStorage.GetAsync<bool>("isAuthenticated");
+            if (authResult.Success && authResult.Value)
+            {
+                Navigation.NavigateTo("/admin");
+            }
+        }
+        catch (Exception)
+        {
+            // Not authenticated, stay on login page
+        }
+    }
+
+    private async Task HandleLogin()
+    {
+        try
+        {
+            isLoading = true;
+            errorMessage = "";
+
+            var isValid = AuthService.ValidateAdmin(loginModel.Username, loginModel.Password);
+            
+            if (isValid)
+            {
+                // Store authentication state
+                await SessionStorage.SetAsync("isAuthenticated", true);
+                await SessionStorage.SetAsync("loginTime", DateTime.UtcNow);
+                
+                // Redirect to admin dashboard
+                Navigation.NavigateTo("/admin", forceLoad: true);
+            }
+            else
+            {
+                errorMessage = "Invalid username or password";
+                loginModel.Password = ""; // Clear password field
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Login error: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    public class LoginModel
+    {
+        [Required(ErrorMessage = "Username is required")]
+        public string Username { get; set; } = "";
+
+        [Required(ErrorMessage = "Password is required")]
+        [MinLength(3, ErrorMessage = "Password must be at least 3 characters")]
+        public string Password { get; set; } = "";
+    }
+}
