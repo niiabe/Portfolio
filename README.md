@@ -85,6 +85,7 @@ This project was a great first step. For future projects, I plan to explore more
 *   Adding user registration and more complex role management.
 *   Deploying the application to a cloud provider like Azure.
 *   Writing automated tests to ensure code quality.
+*   Add image upload instead of ImageURL.
 
 ---
 
