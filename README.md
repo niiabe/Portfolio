@@ -81,7 +81,7 @@ Here's a brief overview of the key files and folders to help you navigate the co
 
 This project was a great first step. For future projects, I plan to explore more advanced features, such as:
 
-*   Implementing a full CRUD (Create, Read, Update, Delete) interface for projects.
+*   Implementing API for CRUD Operations.
 *   Adding user registration and more complex role management.
 *   Deploying the application to a cloud provider like Azure.
 *   Writing automated tests to ensure code quality.
