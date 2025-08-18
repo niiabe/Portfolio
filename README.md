@@ -87,5 +87,40 @@ This project was a great first step. For future projects, I plan to explore more
 *   Writing automated tests to ensure code quality.
 *   Add image upload instead of ImageURL.
 
+## Release and Deployment
+
+This project is versioned starting from `v1.0.0`.
+
+### Creating a Release Build
+
+You can create a release build of the application using the `dotnet publish` command.
+
+**Framework-Dependent Build**
+
+This creates a build that requires the .NET runtime to be installed on the host machine.
+
+```bash
+dotnet publish -c Release
+```
+
+The output will be in the `bin/Release/net9.0/publish/` directory.
+
+**Self-Contained Build**
+
+This creates a build that includes the .NET runtime and can be run on a machine without it installed. You need to specify a runtime identifier (e.g., `linux-x64`, `win-x64`).
+
+```bash
+dotnet publish -c Release --self-contained -r linux-x64
+```
+
+The output will be in the `bin/Release/net9.0/linux-x64/publish/` directory.
+
+### Deployment
+
+For deployment, the self-contained build is recommended for portability.
+
+*   **Docker:** You can create a minimal Docker image by copying the contents of the self-contained publish directory into a base OS image and running the executable.
+*   **Azure:** You can deploy the self-contained files directly to services like Azure App Service, which ensures a predictable runtime environment.
+
 ---
 
